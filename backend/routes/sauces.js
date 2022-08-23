@@ -42,16 +42,15 @@
 const express = require("express");
 const router = express.Router();
 
-const Sauce = require("../models/sauces");
 const saucesCtrl = require("../controllers/sauces");
 
+router.get("/", saucesCtrl.getAllSauces);
 router.post("/", saucesCtrl.createSauce);
-router.get("/", saucesCtrl, getAllSauce);
 
-router.get("/:id", saucesCtrl, getOneSauce);
+router.get("/:id", saucesCtrl.getOneSauce);
 
-router.put("/:id", saucesCtrl, saucesCtrl.modifySauce);
+router.put("/:id", saucesCtrl.modifySauce);
 
-router.delete("/:id", saucesCtrl, deleteSauce);
+router.delete("/:id", saucesCtrl.deleteSauce);
 
 module.exports = router;
