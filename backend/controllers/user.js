@@ -1,4 +1,7 @@
+// Pour sécuriser les mots de passe
 const bcrypt = require("bcrypt");
+
+//
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");

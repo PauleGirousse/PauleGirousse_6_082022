@@ -1,7 +1,10 @@
 const Sauce = require("../models/Sauce");
+// const Like = require("../models/Like");
 
+// Pour la suppression de fichiers
 const fs = require("fs");
 
+// Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -13,7 +16,6 @@ exports.createSauce = (req, res, next) => {
       req.file.filename
     }`,
   });
-
   sauce
     .save()
     .then(() => {
@@ -24,6 +26,7 @@ exports.createSauce = (req, res, next) => {
     });
 };
 
+// Récupération d'une seule sauce de l'API
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
     _id: req.params.id,
@@ -37,7 +40,7 @@ exports.getOneSauce = (req, res, next) => {
       });
     });
 };
-
+// Modification d'une sauce (avant changement, vérifier que l'utilisateur soit le créateur de la sauce)
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
@@ -52,7 +55,7 @@ exports.modifySauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: "Non autorisé" });
+        res.status(403).json({ message: "Non autorisé" });
       } else {
         Sauce.updateOne(
           { _id: req.params.id },
@@ -67,11 +70,12 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
+// Suppression d'une sauce (avant suppression, vérifier que l'utilisateur soit le créateur de cette sauce) et de son image.
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
-        res.status(401).json({ message: "Non autorisé" });
+        res.status(403).json({ message: "Non autorisé" });
       } else {
         const filename = sauce.imageUrl.split("/images/")[1];
         fs.unlink(`images/${filename}`, () => {
@@ -88,6 +92,7 @@ exports.deleteSauce = (req, res, next) => {
     });
 };
 
+// Récupération de toutes les sauces de l'API
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
@@ -99,3 +104,9 @@ exports.getAllSauces = (req, res, next) => {
       });
     });
 };
+
+// Like.deleteOne({ _id: req.params.id })
+//   .then(() => {
+//     res.status(200).json({ message: "Likes supprimé !" });
+//   })
+//   .catch((error) => res.status(401).json({ error }));
