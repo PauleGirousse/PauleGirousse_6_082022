@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
-// 2 utilisateurs ne peuvent pas avoir la même adresse mail
+// L'adresse mail doit être unique
 const uniqueValidator = require("mongoose-unique-validator");
 
+// Schéma d'un compte utilisateur et exportation
 const userSchema = mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },

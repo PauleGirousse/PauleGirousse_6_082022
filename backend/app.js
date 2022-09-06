@@ -1,6 +1,6 @@
 const express = require("express");
 
-// utilisation de framework
+// Utilisation de framework
 const app = express();
 
 const mongoose = require("mongoose");
@@ -8,16 +8,20 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/user");
 const saucesRoutes = require("./routes/sauces");
 const path = require("path");
-// const likeRoutes = require("./routes/sauces");
 
+// Package pour pouvoir utiliser les variables d'environnement
+const dotenv = require("dotenv").config();
+
+// Connexion à la base de données
 mongoose
   .connect(
-    "mongodb+srv://Paule:Projet6@cluster0.xo6qjby.mongodb.net/?retryWrites=true&w=majority",
+    `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/?retryWrites=true&w=majority`,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
+// Autorisation d'accès de différentes origines avec les méthodes suivantes
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -31,13 +35,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Format JSON pour avoir accès au contenu de la requête
+// Pour avoir accès au contenu de la requête (req.body)
 app.use(express.json());
 
 // Routes vers l'API
 app.use("/api/sauces", saucesRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
-// app.use("/api/sauces", likeRoutes);
 
 module.exports = app;

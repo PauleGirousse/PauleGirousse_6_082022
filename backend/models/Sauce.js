@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+mongoose.set("debug", true);
 
+// Schéma d'une sauce et exportation
 const sauceSchema = mongoose.Schema({
   userId: { type: String, required: true },
   name: { type: String, required: true },

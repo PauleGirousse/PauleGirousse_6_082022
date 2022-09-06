@@ -1,5 +1,4 @@
 const Sauce = require("../models/Sauce");
-// const Like = require("../models/Like");
 
 // Pour la suppression de fichiers
 const fs = require("fs");
@@ -40,7 +39,7 @@ exports.getOneSauce = (req, res, next) => {
       });
     });
 };
-// Modification d'une sauce (avant changement, vérifier que l'utilisateur soit le créateur de la sauce)
+// Modification d'une sauce (avant changement, vérification que l'utilisateur soit le créateur de la sauce).
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file
     ? {
@@ -70,7 +69,7 @@ exports.modifySauce = (req, res, next) => {
     });
 };
 
-// Suppression d'une sauce (avant suppression, vérifier que l'utilisateur soit le créateur de cette sauce) et de son image.
+// Suppression d'une sauce (avant suppression, vérification que l'utilisateur soit le créateur de la sauce et de l'image).
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -104,9 +103,3 @@ exports.getAllSauces = (req, res, next) => {
       });
     });
 };
-
-// Like.deleteOne({ _id: req.params.id })
-//   .then(() => {
-//     res.status(200).json({ message: "Likes supprimé !" });
-//   })
-//   .catch((error) => res.status(401).json({ error }));
