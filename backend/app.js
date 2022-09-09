@@ -3,6 +3,9 @@ const express = require("express");
 // Utilisation de framework
 const app = express();
 
+// Utilisation d'helmet
+const helmet = require("helmet");
+
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user");
@@ -11,6 +14,11 @@ const path = require("path");
 
 // Package pour pouvoir utiliser les variables d'environnement
 const dotenv = require("dotenv").config();
+
+app.use(helmet());
+
+// Configuration pour le chargement des images
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 // Connexion à la base de données
 mongoose

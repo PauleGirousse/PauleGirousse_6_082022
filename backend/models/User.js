@@ -12,3 +12,5 @@ const userSchema = mongoose.Schema({
 userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("User", userSchema);
+// var regExpEmail = /([AZ]|[az]|[^<>()\[\]\\\/.,;:\s@"]){4,}\@([AZ]|[az ]|[^<>()\[\]\\\/.,;:\s@"]){4,}\.[az]/ ;
+// var regExpPassword = /(?=.*[az])(?=.*[AZ])(?=.*[0-9])(?=.*[!@#\$%\^&\* ])(?=.{6,})/ ;

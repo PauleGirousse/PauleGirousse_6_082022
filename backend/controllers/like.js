@@ -3,75 +3,74 @@ const Sauce = require("../models/Sauce");
 exports.likeSauce = (req, res, next) => {
   console.log("requete like", req.body);
   const like = req.body.like;
-  // _id= like_req.params.id,
-  //   userId=req.body.userId,
-  Sauce.findOne({ _id: req.params.id })
-    .then((sauce) => {
-      console.log(sauce);
-      const likes = sauce.likes;
-      const usersLiked = sauce.usersLiked;
+  // _id= req.params.id,
+  (userId = req.body.userId),
+    Sauce.findOne({ _id: req.params.id })
+      .then((sauce) => {
+        console.log("sauce", sauce);
 
-      switch (like) {
-        case 1:
-          //l'identifiant de l'utilisateur n'est pas dans le tableau
-          if (!sauce.usersLiked.includes(req.body.userId)) {
-            Sauce.updateOne(
-              { _id: req.params.id },
-              // {
-              //   $inc: { likes: +1 },
-              //   $push: { usersLiked: req.body.userId },
-              // }
-              { likes: like, usersLiked: req.body.userId }
-            );
-            console.log("+1", likes, usersLiked);
-          }
-          break;
-
-        case -1:
-          //L'identifiant de l'utilisateur n'est pas dans le tableau
-          if (!sauce.usersDisliked.includes(req.body.userId)) {
-            Sauce.updateOne(
-              { _id: req.params.id },
-              {
-                $inc: { dislikes: +1 },
-                $push: { usersDisliked: req.body.userId },
-              }
-            );
-          }
-
-          break;
-
-        case 0:
-          //Si l'identifiant de l'utilisateur est déjà dans le tableau
-          if (sauce.usersLiked.includes(req.body.userId)) {
-            Sauce.updateOne(
-              { _id: req.params.id },
-              {
-                $inc: { likes: -1 },
-                $pull: { usersLiked: req.body.userId },
-              }
-            );
-            console.log("sauce_apres", sauce);
-
-            //Si l'identifiant de l'utilisateur est déjà dans le tableau
-            if (sauce.usersDisliked.includes(req.body.userId)) {
+        switch (like) {
+          case 1:
+            //l'identifiant de l'utilisateur n'est pas dans le tableau
+            if (!sauce.usersLiked.includes(req.body.userId)) {
               Sauce.updateOne(
                 { _id: req.params.id },
                 {
-                  $inc: { dislikes: -1 },
-                  $pull: { usersDisliked: req.body.userId },
+                  $inc: { likes: 1 },
+                  $push: { usersLiked: req.body.userId },
+                }
+                // sauce.usersLiked.push(userId),
+                // (sauce.likes += 1)
+              );
+              // console.log("+1", likes, usersLiked);
+            }
+            break;
+
+          case -1:
+            //L'identifiant de l'utilisateur n'est pas dans le tableau
+            if (!sauce.usersDisliked.includes(req.body.userId)) {
+              Sauce.updateOne(
+                { _id: req.params.id },
+                {
+                  $inc: { dislikes: +1 },
+                  $push: { usersDisliked: req.body.userId },
+                }
+              );
+            }
+
+            break;
+
+          case 0:
+            //Si l'identifiant de l'utilisateur est déjà dans le tableau
+            if (sauce.usersLiked.includes(req.body.userId)) {
+              Sauce.updateOne(
+                { _id: req.params.id },
+                {
+                  $inc: { likes: -1 },
+                  $pull: { usersLiked: req.body.userId },
                 }
               );
               console.log("sauce_apres", sauce);
-            }
-          }
-          break;
 
-        default:
-          console.log(error);
-      }
-    })
-    .catch((error) => res.status(404).json({ error }));
+              //Si l'identifiant de l'utilisateur est déjà dans le tableau
+              if (sauce.usersDisliked.includes(req.body.userId)) {
+                Sauce.updateOne(
+                  { _id: req.params.id },
+                  {
+                    $inc: { dislikes: -1 },
+                    $pull: { usersDisliked: req.body.userId },
+                  }
+                );
+                console.log("sauce_apres", sauce);
+              }
+            }
+            break;
+
+          default:
+            console.log(error);
+        }
+      })
+      .catch((error) => res.status(404).json({ error }));
 };
 
 // exports.likeSauce = (req, res, next) => {

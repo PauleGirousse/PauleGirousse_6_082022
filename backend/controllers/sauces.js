@@ -2,27 +2,43 @@ const Sauce = require("../models/Sauce");
 
 // Pour la suppression de fichiers
 const fs = require("fs");
+const { log } = require("console");
+
+// const regExp = /(^<>()\[\]\\\/)(A-Z)(a-z)/;
+const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,!.\s]+$/;
 
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
+
   delete sauceObject._id;
   delete sauceObject._userId;
-  const sauce = new Sauce({
-    ...sauceObject,
-    userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
-  });
-  sauce
-    .save()
-    .then(() => {
-      res.status(201).json({ message: "Sauce enregistrée !" });
-    })
-    .catch((error) => {
-      res.status(400).json({ error });
+  if (
+    regexp.test(sauceObject.name) &&
+    regexp.test(sauceObject.manufacturer) &&
+    regexp.test(sauceObject.description) &&
+    regexp.test(sauceObject.mainPepper)
+  ) {
+    const sauce = new Sauce({
+      ...sauceObject,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
     });
+
+    console.log(sauce);
+    sauce
+      .save()
+      .then(() => {
+        res.status(201).json({ message: "Sauce enregistrée !" });
+      })
+      .catch((error) => {
+        res.status(400).json({ error });
+      });
+  } else {
+    return res.status(400).json({ error });
+  }
 };
 
 // Récupération d'une seule sauce de l'API
