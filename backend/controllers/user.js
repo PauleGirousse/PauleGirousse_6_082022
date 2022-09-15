@@ -26,8 +26,10 @@ exports.signup = (req, res, next) => {
 
       user
         .save()
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
+        .then(() => res.status(201).json({ message: "Utilisateur créé" }))
+        .catch((error) =>
+          res.status(409).json({ message: "email déjà utilisé" })
+        );
     })
     .catch((error) => res.status(500).json({ error }));
 };

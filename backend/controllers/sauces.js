@@ -3,6 +3,7 @@ const Sauce = require("../models/Sauce");
 // Pour la suppression de fichiers
 const fs = require("fs");
 
+// Regex pour les champs de type "chaines de caractères"
 const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,!.\s]+$/;
 
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
@@ -25,11 +26,10 @@ exports.createSauce = (req, res, next) => {
       }`,
     });
 
-    console.log(sauce);
     sauce
       .save()
       .then(() => {
-        res.status(201).json({ message: "Sauce enregistrée !" });
+        res.status(201).json({ message: "Sauce enregistrée" });
       })
       .catch((error) => {
         res.status(400).json({ error });
@@ -74,7 +74,7 @@ exports.modifySauce = (req, res, next) => {
           { _id: req.params.id },
           { ...sauceObject, _id: req.params.id }
         )
-          .then(() => res.status(200).json({ message: "Sauce modifiée!" }))
+          .then(() => res.status(200).json({ message: "Sauce modifiée" }))
           .catch((error) => res.status(401).json({ error }));
       }
     })
@@ -94,7 +94,7 @@ exports.deleteSauce = (req, res, next) => {
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => {
-              res.status(200).json({ message: "Sauce supprimée !" });
+              res.status(200).json({ message: "Sauce supprimée" });
             })
             .catch((error) => res.status(401).json({ error }));
         });
