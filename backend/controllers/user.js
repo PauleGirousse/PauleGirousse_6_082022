@@ -1,38 +1,43 @@
-// Pour sécuriser les mots de passe
+// Pour sécuriser l'adresse mail et le mot de passe de l'utilisateur
 const bcrypt = require("bcrypt");
+const cryptojs = require("crypto-js");
+
+// Pour utiliser les variables d'environnement
+require("dotenv").config();
 
 // Utilisation du token
 const jwt = require("jsonwebtoken");
-var validator = require("email-validator");
 
+// Utilisation du schéma utilisateur
 const User = require("../models/User");
 
-// Fonction d'enregistrement d'un utilisateur
+// Fonction d'enregistrement d'un utilisateur avec cryptage de l'adresse mail et du mot de passe
 exports.signup = (req, res, next) => {
-  if (validator.validate("test@email.com")) {
-    bcrypt
-      .hash(req.body.password, 10)
-      .then((hash) => {
-        const user = new User({
-          email: req.body.email,
-          password: hash,
-        });
-        user
-          .save()
-          .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-          .catch((error) => res.status(400).json({ error }));
-      })
-      .catch((error) => res.status(500).json({ error }));
-  } else {
-    return res.status(400).json({
-      error: "L'email n'est pas valide",
-    });
-  }
+  const cryptoEmail = cryptojs
+    .HmacSHA256(req.body.email, process.env.CRYPTO_EMAIL)
+    .toString();
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) => {
+      const user = new User({
+        email: cryptoEmail,
+        password: hash,
+      });
+
+      user
+        .save()
+        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+        .catch((error) => res.status(400).json({ error }));
+    })
+    .catch((error) => res.status(500).json({ error }));
 };
 
-// Fonction de connexion d'un utilisateur
+// Fonction de connexion d'un utilisateur avec cryptage de l'adresse mail et comparaison du mot de passe
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email })
+  const cryptoEmail = cryptojs
+    .HmacSHA256(req.body.email, process.env.CRYPTO_EMAIL)
+    .toString();
+  User.findOne({ email: cryptoEmail })
     .then((user) => {
       if (!user) {
         return res

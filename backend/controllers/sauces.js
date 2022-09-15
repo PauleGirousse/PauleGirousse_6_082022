@@ -2,9 +2,7 @@ const Sauce = require("../models/Sauce");
 
 // Pour la suppression de fichiers
 const fs = require("fs");
-const { log } = require("console");
 
-// const regExp = /(^<>()\[\]\\\/)(A-Z)(a-z)/;
 const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,!.\s]+$/;
 
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
@@ -37,7 +35,7 @@ exports.createSauce = (req, res, next) => {
         res.status(400).json({ error });
       });
   } else {
-    return res.status(400).json({ error });
+    return res.status(400).json({ message: "champs invalides" });
   }
 };
 

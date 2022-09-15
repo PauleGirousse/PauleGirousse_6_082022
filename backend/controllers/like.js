@@ -21,8 +21,14 @@ exports.likeSauce = (req, res, next) => {
                 }
                 // sauce.usersLiked.push(userId),
                 // (sauce.likes += 1)
-              );
-              // console.log("+1", likes, usersLiked);
+              )
+                .then(() => {
+                  res.status(201).json({ message: "Choix enregistré !" });
+                })
+                .catch((error) => {
+                  res.status(500).json({ error });
+                  // console.log("+1", likes, usersLiked);
+                });
             }
             break;
 
@@ -35,7 +41,14 @@ exports.likeSauce = (req, res, next) => {
                   $inc: { dislikes: +1 },
                   $push: { usersDisliked: req.body.userId },
                 }
-              );
+              )
+                .then(() => {
+                  res.status(201).json({ message: "Choix enregistré !" });
+                })
+                .catch((error) => {
+                  res.status(500).json({ error });
+                  // console.log("+1", likes, usersLiked);
+                });
             }
 
             break;
@@ -49,24 +62,39 @@ exports.likeSauce = (req, res, next) => {
                   $inc: { likes: -1 },
                   $pull: { usersLiked: req.body.userId },
                 }
-              );
+              )
+                .then(() => {
+                  res.status(201).json({ message: "Choix enregistré !" });
+                })
+                .catch((error) => {
+                  res.status(500).json({ error });
+                  // console.log("+1", likes, usersLiked);
+                });
               console.log("sauce_apres", sauce);
-
-              //Si l'identifiant de l'utilisateur est déjà dans le tableau
-              if (sauce.usersDisliked.includes(req.body.userId)) {
-                Sauce.updateOne(
-                  { _id: req.params.id },
-                  {
-                    $inc: { dislikes: -1 },
-                    $pull: { usersDisliked: req.body.userId },
-                  }
-                );
-                console.log("sauce_apres", sauce);
-              }
             }
+
+            //Si l'identifiant de l'utilisateur est déjà dans le tableau
+            if (sauce.usersDisliked.includes(req.body.userId)) {
+              Sauce.updateOne(
+                { _id: req.params.id },
+                {
+                  $inc: { dislikes: -1 },
+                  $pull: { usersDisliked: req.body.userId },
+                }
+              )
+                .then(() => {
+                  res.status(201).json({ message: "Choix enregistré !" });
+                })
+                .catch((error) => {
+                  res.status(500).json({ error });
+                  // console.log("+1", likes, usersLiked);
+                });
+            }
+            console.log("sauce_apres", sauce);
             break;
 
           default:
+            res.status(400).json({ error });
             console.log(error);
         }
       })
