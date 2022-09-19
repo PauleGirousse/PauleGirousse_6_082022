@@ -1,7 +1,7 @@
-const passwordValidator = require("password-validator");
+const PasswordValidator = require("password-validator");
 
 // Création d'un schéma de validation du mot de passe utilisateur
-const passwordSchema = new passwordValidator();
+const passwordSchema = new PasswordValidator();
 passwordSchema
   .is()
   .min(8) // longueur minimale de 8
@@ -23,7 +23,7 @@ module.exports = (req, res, next) => {
   } else {
     return res.status(400).json({
       error:
-        "Le mot de passe doit contenir entre 8 et 20 caractères, au moins une majuscule et une minuscule, sans espace ni certains caractères spéciaux",
+        "Le mot de passe doit contenir entre 8 et 20 caractères, au moins une majuscule et une minuscule, sans certains caractères spéciaux <>(),;: ni espace",
     });
   }
 };

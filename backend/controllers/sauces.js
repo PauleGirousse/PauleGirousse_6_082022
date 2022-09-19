@@ -1,17 +1,18 @@
-const Sauce = require("../models/Sauce");
-
 // Pour la suppression de fichiers
 const fs = require("fs");
+
+// Modèle de sauce
+const Sauce = require("../models/Sauce");
 
 // Regex pour les champs de type "chaines de caractères"
 const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,!.\s]+$/;
 
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
-exports.createSauce = (req, res, next) => {
+exports.createSauce = (req, res) => {
   const sauceObject = JSON.parse(req.body.sauce);
 
-  delete sauceObject._id;
-  delete sauceObject._userId;
+  delete sauceObject.id;
+  delete sauceObject.userId;
   if (
     regexp.test(sauceObject.name) &&
     regexp.test(sauceObject.manufacturer) &&
@@ -40,7 +41,7 @@ exports.createSauce = (req, res, next) => {
 };
 
 // Récupération d'une seule sauce de l'API
-exports.getOneSauce = (req, res, next) => {
+exports.getOneSauce = (req, res) => {
   Sauce.findOne({
     _id: req.params.id,
   })
@@ -48,13 +49,11 @@ exports.getOneSauce = (req, res, next) => {
       res.status(200).json(sauce);
     })
     .catch((error) => {
-      res.status(404).json({
-        error: error,
-      });
+      res.status(404).json({ error });
     });
 };
 // Modification d'une sauce (avant changement, vérification que l'utilisateur soit le créateur de la sauce).
-exports.modifySauce = (req, res, next) => {
+exports.modifySauce = (req, res) => {
   const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),
@@ -64,10 +63,10 @@ exports.modifySauce = (req, res, next) => {
       }
     : { ...req.body };
 
-  delete sauceObject._userId;
+  delete sauceObject.userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
+      if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé" });
       } else {
         Sauce.updateOne(
@@ -84,10 +83,10 @@ exports.modifySauce = (req, res, next) => {
 };
 
 // Suppression d'une sauce (avant suppression, vérification que l'utilisateur soit le créateur de la sauce et de l'image).
-exports.deleteSauce = (req, res, next) => {
+exports.deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
+      if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé" });
       } else {
         const filename = sauce.imageUrl.split("/images/")[1];
@@ -106,14 +105,12 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 // Récupération de toutes les sauces de l'API
-exports.getAllSauces = (req, res, next) => {
+exports.getAllSauces = (req, res) => {
   Sauce.find()
     .then((sauces) => {
       res.status(200).json(sauces);
     })
     .catch((error) => {
-      res.status(400).json({
-        error: error,
-      });
+      res.status(400).json({ error });
     });
 };

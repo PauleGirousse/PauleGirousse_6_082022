@@ -33,7 +33,7 @@ const errorHandler = (error) => {
       process.exit(1);
       break;
     default:
-      throwerror;
+      throw error;
   }
 };
 

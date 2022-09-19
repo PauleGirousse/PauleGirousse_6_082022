@@ -3,7 +3,7 @@ const express = require("express");
 // Utilisation de framework
 const app = express();
 
-// Utilisation d'helmet
+// Sécurisation des en-têtes HTTP
 const helmet = require("helmet");
 
 const mongoose = require("mongoose");
@@ -13,11 +13,10 @@ const saucesRoutes = require("./routes/sauces");
 const path = require("path");
 
 // Package pour pouvoir utiliser les variables d'environnement
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 
+// Utilisation d'helmet et configuration pour le chargement des images
 app.use(helmet());
-
-// Configuration pour le chargement des images
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 // Connexion à la base de données

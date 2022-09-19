@@ -12,7 +12,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 // Fonction d'enregistrement d'un utilisateur avec cryptage de l'adresse mail et du mot de passe
-exports.signup = (req, res, next) => {
+exports.signup = (req, res) => {
   const cryptoEmail = cryptojs
     .HmacSHA256(req.body.email, process.env.CRYPTO_EMAIL)
     .toString();
@@ -27,15 +27,13 @@ exports.signup = (req, res, next) => {
       user
         .save()
         .then(() => res.status(201).json({ message: "Utilisateur créé" }))
-        .catch((error) =>
-          res.status(409).json({ message: "email déjà utilisé" })
-        );
+        .catch(() => res.status(409).json({ message: "email déjà utilisé" }));
     })
     .catch((error) => res.status(500).json({ error }));
 };
 
 // Fonction de connexion d'un utilisateur avec cryptage de l'adresse mail et comparaison du mot de passe
-exports.login = (req, res, next) => {
+exports.login = (req, res) => {
   const cryptoEmail = cryptojs
     .HmacSHA256(req.body.email, process.env.CRYPTO_EMAIL)
     .toString();
@@ -55,8 +53,8 @@ exports.login = (req, res, next) => {
               .json({ message: "Paire login/mot de passe incorrecte" });
           }
           res.status(200).json({
-            userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            userId: user.id,
+            token: jwt.sign({ userId: user.id }, "RANDOM_TOKEN_SECRET", {
               expiresIn: "24h",
             }),
           });

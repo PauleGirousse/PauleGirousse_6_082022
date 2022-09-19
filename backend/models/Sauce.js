@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 mongoose.set("debug", true);
 
 // Schéma d'une sauce et exportation
