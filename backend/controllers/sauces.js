@@ -55,52 +55,49 @@ exports.getOneSauce = (req, res) => {
 // Modification d'une sauce (avant changement, vérification que l'utilisateur soit le créateur de la sauce et création du nouvel objet sauce).
 exports.modifySauce = (req, res) => {
   if (req.file) {
-    Sauce.findOne({ _id: req.params.id });
-    .then((sauce) => {
-      if (sauce.userId !== req.auth.userId) {
-        res.status(403).json({ message: "Non autorisé" });}
-      else{
-      const filename = Sauce.imageUrl.split("/images/")[1];
-      fs.unlink(`images/${filename}`);
-  
-      const sauceObject = {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
-      };
-      delete sauceObject.userId;}})
-    .catch((error) => res.status(401).json({ error }))
+    const filename = Sauce.imageUrl.split("/images/")[1];
+    fs.unlink(`images/${filename}`);
+
+    const sauceObject = {
+      ...JSON.parse(req.body.sauce),
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
+    };
+    delete sauceObject.userId;
   } else {
-    const sauceObject = { ...req.body };
+    const sauceObject = {
+      ...JSON.parse(req.body.sauce),
+    };
     delete sauceObject.userId;
   }
+
   Sauce.findOne({ _id: req.params.id })
-  .then((sauce) => {
-    if (sauce.userId !== req.auth.userId) {
-      res.status(403).json({ message: "Non autorisé" });
-    } else {
-      if (
-        regexp.test(sauceObject.name) &&
-        regexp.test(sauceObject.manufacturer) &&
-        regexp.test(sauceObject.description) &&
-        regexp.test(sauceObject.mainPepper)
+    .then((sauce) => {
+      if (sauce.userId !== req.auth.userId) {
+        res.status(403).json({ message: "Non autorisé" });
+      } else {
+        if (
+          regexp.test(sauceObject.name) &&
+          regexp.test(sauceObject.manufacturer) &&
+          regexp.test(sauceObject.description) &&
+          regexp.test(sauceObject.mainPepper)
         ) {
           Sauce.updateOne(
             { _id: req.params.id },
             { ...sauceObject, _id: req.params.id }
-            )
+          )
             .then(() => res.status(200).json({ message: "Sauce modifiée" }))
             .catch((error) => res.status(401).json({ error }));
-          } else {
-            return res.status(400).json({ message: "champs invalides" });
-          }
+        } else {
+          return res.status(400).json({ message: "champs invalides" });
         }
-      })
-      .catch((error) => {
-        res.status(400).json({ error });
-      });
-    };
+      }
+    })
+    .catch((error) => {
+      res.status(400).json({ error });
+    });
+};
 
 // Suppression d'une sauce (avant suppression, vérification que l'utilisateur soit le créateur de la sauce et de l'image).
 exports.deleteSauce = (req, res) => {
@@ -133,4 +130,57 @@ exports.getAllSauces = (req, res) => {
     .catch((error) => {
       res.status(400).json({ error });
     });
-}
+};
+
+// if (req.file) {
+//   Sauce.findOne({ _id: req.params.id });
+//   .then((sauce) => {
+//     if (sauce.userId !== req.auth.userId) {
+//       res.status(403).json({ message: "Non autorisé" });}
+//     else{
+//     const filename = Sauce.imageUrl.split("/images/")[1];
+//     fs.unlink(`images/${filename}`);
+
+//     const sauceObject = {
+//       ...JSON.parse(req.body.sauce),
+//       imageUrl: `${req.protocol}://${req.get("host")}/images/${
+//         req.file.filename
+//       }`,
+//     };
+//     delete sauceObject.userId;}})
+//   .catch((error) => res.status(401).json({ error }))
+// } else {
+//   const sauceObject = { ...req.body };
+//   delete sauceObject.userId;
+// }
+
+// if (req.file) {
+//   Sauce.findOne({ _id: req.params.id });
+//   .then((sauce) => {
+//     if (sauce.userId !== req.auth.userId) {
+//       res.status(403).json({ message: "Non autorisé" });}
+//     else{
+//     const filename = Sauce.imageUrl.split("/images/")[1];
+//     fs.unlink(`images/${filename}`);
+
+//     const sauceObject = {
+//       ...JSON.parse(req.body.sauce),
+//       imageUrl: `${req.protocol}://${req.get("host")}/images/${
+//         req.file.filename
+//       }`,
+//     };
+//     delete sauceObject.userId;}})
+//   .catch((error) => res.status(401).json({ error }))
+// } else {
+//   const sauceObject = { ...req.body };
+//   delete sauceObject.userId;
+
+// const sauceObject =
+// req.file
+//   ? {
+//       ...JSON.parse(req.body.sauce),
+//       imageUrl: `${req.protocol}://${req.get("host")}/images/${
+//         req.file.filename
+//       }`,
+//     }
+//   : { ...req.body };
