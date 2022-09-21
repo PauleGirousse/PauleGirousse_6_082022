@@ -54,43 +54,43 @@ exports.getOneSauce = (req, res) => {
 };
 // Modification d'une sauce (avant changement, vérification que l'utilisateur soit le créateur de la sauce et création du nouvel objet sauce).
 exports.modifySauce = (req, res) => {
-  if (req.file) {
-    const filename = Sauce.imageUrl.split("/images/")[1];
-    fs.unlink(`images/${filename}`);
-
-    const sauceObject = {
-      ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get("host")}/images/${
-        req.file.filename
-      }`,
-    };
-    delete sauceObject.userId;
-  } else {
-    const sauceObject = {
-      ...JSON.parse(req.body.sauce),
-    };
-    delete sauceObject.userId;
-  }
-
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé" });
       } else {
-        if (
-          regexp.test(sauceObject.name) &&
-          regexp.test(sauceObject.manufacturer) &&
-          regexp.test(sauceObject.description) &&
-          regexp.test(sauceObject.mainPepper)
-        ) {
+        if (req.file) {
+          const filename = sauce.imageUrl.split("/images/")[1];
+          fs.unlink(`images/${filename}`, () => {
+            const sauceObject = {
+              ...JSON.parse(req.body.sauce),
+              imageUrl: `${req.protocol}://${req.get("host")}/images/${
+                req.file.filename
+              }`,
+            };
+            delete sauceObject.userId;
+            Sauce.updateOne(
+              { _id: req.params.id },
+              { ...sauceObject, _id: req.params.id }
+            )
+              .then(() => {
+                res.status(200).json({ message: "image et sauce modifiées" });
+              })
+              .catch((error) => res.status(401).json({ error }));
+          });
+        } else {
+          const sauceObject = {
+            ...JSON.parse(req.body.sauce),
+          };
+          delete sauceObject.userId;
           Sauce.updateOne(
             { _id: req.params.id },
             { ...sauceObject, _id: req.params.id }
           )
-            .then(() => res.status(200).json({ message: "Sauce modifiée" }))
+            .then(() => {
+              res.status(200).json({ message: "sauce modifiée" });
+            })
             .catch((error) => res.status(401).json({ error }));
-        } else {
-          return res.status(400).json({ message: "champs invalides" });
         }
       }
     })
@@ -98,6 +98,32 @@ exports.modifySauce = (req, res) => {
       res.status(400).json({ error });
     });
 };
+//   Sauce.findOne({ _id: req.params.id })
+//     .then((sauce) => {
+//       if (sauce.userId !== req.auth.userId) {
+//         res.status(403).json({ message: "Non autorisé" });
+//       } else {
+//         if (
+//           regexp.test(sauceObject.name) &&
+//           regexp.test(sauceObject.manufacturer) &&
+//           regexp.test(sauceObject.description) &&
+//           regexp.test(sauceObject.mainPepper)
+//         ) {
+//           Sauce.updateOne(
+//             { _id: req.params.id },
+//             { ...sauceObject, _id: req.params.id }
+//           )
+//             .then(() => res.status(200).json({ message: "Sauce modifiée" }))
+//             .catch((error) => res.status(401).json({ error }));
+//         } else {
+//           return res.status(400).json({ message: "champs invalides" });
+//         }
+//       }
+//     })
+//     .catch((error) => {
+//       res.status(400).json({ error });
+//     });
+// };
 
 // Suppression d'une sauce (avant suppression, vérification que l'utilisateur soit le créateur de la sauce et de l'image).
 exports.deleteSauce = (req, res) => {
@@ -133,11 +159,9 @@ exports.getAllSauces = (req, res) => {
 };
 
 // if (req.file) {
-//   Sauce.findOne({ _id: req.params.id });
+//   Sauce.findOne({ _id: req.params.id })
 //   .then((sauce) => {
-//     if (sauce.userId !== req.auth.userId) {
-//       res.status(403).json({ message: "Non autorisé" });}
-//     else{
+
 //     const filename = Sauce.imageUrl.split("/images/")[1];
 //     fs.unlink(`images/${filename}`);
 

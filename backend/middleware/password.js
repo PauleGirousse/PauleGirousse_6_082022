@@ -16,7 +16,7 @@ passwordSchema
   //   .spaces() // ne contient pas d'espace
   .not(/[<>(),;:\s]/);
 
-// Validation du mot de passe avant qu'il ne soit crypté
+// Validation du format du mot de passe avant qu'il ne soit crypté
 module.exports = (req, res, next) => {
   if (passwordSchema.validate(req.body.password)) {
     next();
