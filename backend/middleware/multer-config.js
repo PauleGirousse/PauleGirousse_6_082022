@@ -1,5 +1,6 @@
 const multer = require("multer");
 
+// Pour créer un fichier à partir de l'image reçue (nommée et stockée dans le dossier images)
 const MIME_TYPES = {
   "image/jpg": "jpg",
   "image/jpeg": "jpg",

@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 
+// Fonction d'authentification à partir du token pour autoriser l'accès aux différentes routes
 module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
