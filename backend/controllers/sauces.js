@@ -78,7 +78,7 @@ exports.modifySauce = (req, res) => {
               { ...sauceObject, _id: req.params.id }
             )
               .then(() => {
-                res.status(200).json({ message: "image et sauce modifiées" });
+                res.status(200).json({ message: "sauce modifiée" });
               })
               .catch((error) => {
                 console.log(error);
