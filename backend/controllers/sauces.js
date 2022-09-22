@@ -4,6 +4,9 @@ const fs = require("fs");
 // Modèle de sauce
 const Sauce = require("../models/Sauce");
 
+// Regex pour les champs de type "chaines de caractères"
+const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,&!.\s]+$/;
+
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
 exports.createSauce = (req, res) => {
   const sauceObject = JSON.parse(req.body.sauce);
@@ -11,22 +14,33 @@ exports.createSauce = (req, res) => {
   delete sauceObject.id;
   delete sauceObject.userId;
 
-  const sauce = new Sauce({
-    ...sauceObject,
-    userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
-  });
-
-  sauce
-    .save()
-    .then(() => {
-      res.status(201).json({ message: "Sauce enregistrée" });
-    })
-    .catch((error) => {
-      res.status(400).json({ error });
+  if (
+    regexp.test(sauceObject.name) &&
+    regexp.test(sauceObject.manufacturer) &&
+    regexp.test(sauceObject.description) &&
+    regexp.test(sauceObject.mainPepper)
+  ) {
+    const sauce = new Sauce({
+      ...sauceObject,
+      userId: req.auth.userId,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
     });
+
+    sauce
+      .save()
+      .then(() => {
+        res.status(201).json({ message: "Sauce enregistrée" });
+      })
+      .catch((error) => {
+        res.status(400).json({ error });
+      });
+  } else {
+    return res.status(400).json({
+      error: "Champs invalides",
+    });
+  }
 };
 
 // Récupération d'une seule sauce de l'API
