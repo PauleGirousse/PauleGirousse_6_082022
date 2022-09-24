@@ -27,12 +27,12 @@ exports.signup = (req, res) => {
       user
         .save()
         .then(() => res.status(201).json({ message: "Utilisateur créé" }))
-        .catch(() => res.status(409).json({ message: "email déjà utilisé" }));
+        .catch((error) => res.status(400).json({ error }));
     })
     .catch((error) => res.status(500).json({ error }));
 };
 
-// Fonction de connexion d'un utilisateur avec cryptage de l'adresse mail et comparaison du mot de passe
+// Fonction de connexion d'un utilisateur avec cryptage de l'adresse mail et comparaison du hash du mot de passe
 exports.login = (req, res) => {
   const cryptoEmail = cryptojs
     .HmacSHA256(req.body.email, process.env.CRYPTO_EMAIL)
@@ -54,9 +54,13 @@ exports.login = (req, res) => {
           }
           res.status(200).json({
             userId: user.id,
-            token: jwt.sign({ userId: user.id }, "RANDOM_TOKEN_SECRET", {
-              expiresIn: "24h",
-            }),
+            token: jwt.sign(
+              { userId: user.id },
+              `${process.env.RANDOM_TOKEN_SECRET}`,
+              {
+                expiresIn: "24h",
+              }
+            ),
           });
         })
         .catch((error) => res.status(500).json({ error }));

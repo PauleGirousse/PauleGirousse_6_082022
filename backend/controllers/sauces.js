@@ -5,7 +5,7 @@ const fs = require("fs");
 const Sauce = require("../models/Sauce");
 
 // Regex pour les champs de type "chaines de caractères"
-const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,&!.\s]+$/;
+const regexp = /^[a-zA-Zàâäéèêëïîôöùûüç0-9'\-,&!.\s]+$/;
 
 // Création d'une sauce (suppression de l'indentifiant pour en générer un à partir du token)
 exports.createSauce = (req, res) => {
@@ -56,16 +56,21 @@ exports.getOneSauce = (req, res) => {
     });
 };
 
-// Modification d'une sauce (avant changement, vérification que l'utilisateur soit le créateur de la sauce et création du nouvel objet sauce).
+// Modification d'une sauce
 exports.modifySauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
+      // Si l'utilisateur n'est pas le créateur de la sauce
       if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé" });
+        // L'utilisateur est le créateur de la sauce
       } else {
+        // Si la requête contient une image
         if (req.file) {
+          // Suppression du fichier image
           const filename = sauce.imageUrl.split("/images/")[1];
           fs.unlink(`images/${filename}`, () => {
+            // Création du nouvel objet avec la nouvelle image
             const sauceObject = {
               ...req.body,
               imageUrl: `${req.protocol}://${req.get("host")}/images/${
@@ -73,18 +78,20 @@ exports.modifySauce = (req, res) => {
               }`,
             };
             delete sauceObject.userId;
+            // Mise à jour de la sauce
             Sauce.updateOne(
               { _id: req.params.id },
               { ...sauceObject, _id: req.params.id }
             )
               .then(() => {
-                res.status(200).json({ message: "sauce modifiée" });
+                res.status(200).json({ message: "image et sauce modifiées" });
               })
               .catch((error) => {
                 console.log(error);
                 res.status(401).json({ error });
               });
           });
+          // Si la requête ne contient pas d'image
         } else {
           const sauceObject = {
             ...req.body,
@@ -107,13 +114,15 @@ exports.modifySauce = (req, res) => {
     });
 };
 
-// Suppression d'une sauce (avant suppression, vérification que l'utilisateur soit le créateur de la sauce et de l'image).
+// Suppression d'une sauce
 exports.deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
+      // Si l'utilisateur n'est pas le créateur de la sauce
       if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Non autorisé" });
       } else {
+        // Suppression de l'image
         const filename = sauce.imageUrl.split("/images/")[1];
         fs.unlink(`images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })

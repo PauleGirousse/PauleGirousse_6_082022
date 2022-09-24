@@ -1,5 +1,5 @@
 // Regex pour les champs de type "chaines de caractères"
-const regexp = /^[a-zA-Zàâäéèêëïîôöùüç0-9'\-,&!.\s]+$/;
+const regexp = /^[a-zA-Zàâäéèêëïîôöùûüç0-9'\-,&!.\s]+$/;
 
 // Pour valider les champs des inputs de la sauce à modifier selon la regexp
 module.exports = (req, res, next) => {

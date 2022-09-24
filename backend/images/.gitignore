@@ -1,3 +1,3 @@
+# Pour ignorer les fichiers contenus dans le dossier images sauf .gitignore  
 *
-*/
 !.gitignore
